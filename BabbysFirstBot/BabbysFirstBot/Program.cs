@@ -30,7 +30,7 @@ namespace BabbysFirstBot
 
             CreateCommands();
 
-            var token = "MjY1ODMzNTI1Nzg0MDg0NDgw.C1OQrA.tldP0yAwWOgGTYrsnPEiuMzyC3Y";
+            var token = "";
 
             //Connect Bot to Server
             _client.ExecuteAndWait(async () =>
