@@ -7,37 +7,34 @@ using System;
 
 namespace BabbysFirstBot
 {
-    public class Program
+    public class BabbysFirstBot
     {
-        public static void Main(string[] args) => new Program().Start(args);
-        private const string AppName = "Babby's First Bot";
-        private string APP_TOKEN = "MjY1ODMzNTI1Nzg0MDg0NDgw.C1OQrA.tldP0yAwWOgGTYrsnPEiuMzyC3Y";
-
+        private static string APP_TOKEN;
         private static DiscordClient _client;
-        private AdminModule _admin;     //Bot Module for user maangement
-        private GameModule _game;       //Bot Module for "fun stuff"
-        
-        private void Start(string[] args)
-        {   
-#if !DNXCORE50
-            Console.Title = $"{AppName} (Discord.Net v{DiscordConfig.LibVersion})";
-#endif
-            
-            _client = new DiscordClient( x=>
+
+        //Bot Modules
+        private static AdminModule _admin;
+        private static GameModule _game;
+
+        static BabbysFirstBot()
+        {
+            APP_TOKEN = "MjY1ODMzNTI1Nzg0MDg0NDgw.C1OQrA.tldP0yAwWOgGTYrsnPEiuMzyC3Y";
+
+            _client = new DiscordClient(x =>
             {
-                x.AppName = AppName;
+                x.AppName = "Babby's First Bot";
                 x.LogLevel = LogSeverity.Info;
                 x.LogHandler = OnLogMessage;
             })
-            .UsingCommands(x =>
-            {
+           .UsingCommands(x =>
+           {
                x.AllowMentionPrefix = true;
                x.HelpMode = HelpMode.Public;
                x.ExecuteHandler = OnCommandExecuted;
                x.ErrorHandler = OnCommandError;
-               x.PrefixChar = '~'; //prefix needed to activate bot commands
-            })
-            .UsingPermissionLevels(PermissionLevelResolver);
+               x.PrefixChar = '!'; //prefix needed to activate bot commands
+           })
+           .UsingPermissionLevels(PermissionLevelResolver);
 
             //Begin loggine messages
             _client.Log.Message += (sender, e) => Console.WriteLine($"[{e.Severity}] {e.Source}: {e.Message}");
@@ -46,21 +43,24 @@ namespace BabbysFirstBot
             _admin = new AdminModule(_client);
             _game = new GameModule(_client);
 
-            OnJoin(_client);
-            OnLeave(_client);
-
             //Connect Bot to Server
             _client.ExecuteAndWait(async () =>
             {
+                while (true)
+                {
+
                     try
                     {
-                        await _client.Connect(APP_TOKEN, TokenType.Bot);
+
+                        await _client.Connect(BabbysFirstBot.APP_TOKEN, TokenType.Bot);
                         _client.SetGame("ur mum");
+                        break;
                     }
                     catch (Exception ex)
                     {
                         _client.Log.Error($"Login Failed", ex);
                     }
+                }
             });
         }
 
@@ -98,24 +98,6 @@ namespace BabbysFirstBot
         static private void OnCommandExecuted(object sender, CommandEventArgs e)
         {
             _client.Log.Info("Command", $"{e.Command.Text} ({e.User.Name})");
-        }
-
-        static private void OnJoin(DiscordClient myClient)
-        {
-            _client.UserJoined += async (s, e) =>
-            {
-                var channel = myClient.GetChannel(265825030187778048);
-                await channel.SendMessage(e.User.Mention + " has joined!");
-            };
-        }
-
-        static private void OnLeave(DiscordClient myClient)
-        {
-            _client.UserLeft += async (s, e) =>
-            {
-                var channel = myClient.GetChannel(265825030187778048);
-                await channel.SendMessage(e.User.Mention + " has left!");
-            };
         }
 
         static private void OnLogMessage(object sender, LogMessageEventArgs e)
