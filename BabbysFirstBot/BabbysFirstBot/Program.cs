@@ -11,7 +11,7 @@ namespace BabbysFirstBot
     {
         public static void Main(string[] args) => new Program().Start(args);
         private const string AppName = "Babby's First Bot";
-        private string APP_TOKEN = "MjY1ODMzNTI1Nzg0MDg0NDgw.C1OQrA.tldP0yAwWOgGTYrsnPEiuMzyC3Y";
+        private string APP_TOKEN = "";
 
         private static DiscordClient _client;
         private AdminModule _admin;     //Bot Module for user maangement
